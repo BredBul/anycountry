@@ -1,0 +1,23 @@
+{
+  "name": "countries",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.2.37",
+    "vue-loading-overlay": "5.0",
+    "vue-router": "^4.0.14",
+    "vue-select": "^4.0.0-beta.3"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^3.0.0",
+    "sass": "^1.54.3",
+    "vite": "^3.0.0",
+    "vuex": "^4.0.2"
+  }
+}
