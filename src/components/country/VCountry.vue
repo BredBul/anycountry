@@ -2,12 +2,15 @@
   <div class="country">
     <div class="country__body">
       <div class="country__flag _ibg">
-        <img :src="flag" :alt="name" />
+        <img
+          :src="`https://countryflagsapi.com/svg/${flag.toLowerCase()}`"
+          :alt="name"
+        />
       </div>
       <div class="country__name">{{ name }}</div>
       <div class="country__item">Population: {{ population }}</div>
       <div class="country__item">Region: {{ region }}</div>
-      <div class="country__item">Capital: {{ capital }}</div>
+      <div class="country__item">Capital: {{ capital.join(", ") }}</div>
     </div>
   </div>
 </template>

@@ -1,15 +1,26 @@
 <template>
   <section class="page__main-block main-block">
-    <loading v-model:active="isLoading" />
     <div class="main-block__container _container">
-      <div class="main-block__search">
-        <input
-          type="text"
-          v-model="search"
-          placeholder="Search for countries"
+      <div class="main-block__content">
+        <v-country
+          v-for="(country, i) in properties"
+          :key="i"
+          :flag="country.cca2"
+          :name="country.name.common"
+          :population="country.population"
+          :region="country.region"
+          :capital="country.capital"
         />
       </div>
-      <div class="main-block__filters">
+      <div
+        class="item error"
+        v-if="$store.state.searchValue && !filteredList.length"
+      >
+        <p>No results found!</p>
+      </div>
+    </div>
+    <Transition name="menu">
+      <div class="main-block__filters" v-if="$store.state.menuStatus">
         <v-select
           class="main-block__regions"
           :options="options"
@@ -26,17 +37,20 @@
           label="label"
         ></v-select>
         <div class="main-block__checkboxes">
-          <div v-for="option in colorCheckboxes">
-            <input
-              :id="`checkbox-${option.value}`"
-              type="checkbox"
-              :value="option.value"
-              v-model="checkbox"
-            />
-            <label
-              :class="`main-block__checkbox-${option.value}`"
-              :for="`checkbox-${option.value}`"
-            ></label>
+          <span>Filter by flag colors</span>
+          <div class="main-block__checkboxes-wrap">
+            <div v-for="option in colorCheckboxes" class="main-block__checkbox">
+              <input
+                :id="`checkbox-${option}`"
+                type="checkbox"
+                :value="option"
+                v-model="checkbox"
+              />
+              <label
+                :class="`main-block__checkbox-${option}`"
+                :for="`checkbox-${option}`"
+              ></label>
+            </div>
           </div>
         </div>
         <div class="main-block__radio">
@@ -58,22 +72,26 @@
             >
           </div>
         </div>
+        <div class="main-block__properties">
+          <span>Filter by flag properties</span>
+          <div class="main-block__properties-wrap">
+            <div v-for="option in propertiesCheckboxes">
+              <input
+                :id="`property-${option}`"
+                type="checkbox"
+                :value="option"
+                v-model="selectedProperty"
+              />
+              <label
+                :class="`main-block__property-${option}`"
+                :for="`property-${option}`"
+                >{{ option }}</label
+              >
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="main-block__content">
-        <v-country
-          v-for="(country, i) in color"
-          :key="i"
-          :flag="country.flags.svg"
-          :name="country.name.common"
-          :population="country.population"
-          :region="country.region"
-          :capital="country.capital"
-        />
-      </div>
-      <div class="item error" v-if="search && !filteredList.length">
-        <p>No results found!</p>
-      </div>
-    </div>
+    </Transition>
   </section>
 </template>
 
@@ -93,10 +111,10 @@ export default {
   data() {
     return {
       countries: [],
-      search: "",
       selected: "nameAZ",
       selectedRegion: null,
       checkbox: [],
+      selectedProperty: [],
       includes: "all",
       options: [
         { label: "A to Z", value: "nameAZ" },
@@ -105,32 +123,15 @@ export default {
         { label: "By population: higher to lower", value: "populationHigher" },
       ],
       regionsOptions: ["Africa", "Americas", "Asia", "Europe", "Oceania"],
-      placeholderRegion: "select",
       colorCheckboxes: [
-        {
-          value: "Red",
-        },
-        {
-          value: "Saffron",
-        },
-        {
-          value: "Yellow",
-        },
-        {
-          value: "Green",
-        },
-        {
-          value: "Blue",
-        },
-        {
-          value: "LiBlue",
-        },
-        {
-          value: "Black",
-        },
-        {
-          value: "White",
-        },
+        "Red",
+        "Saffron",
+        "Yellow",
+        "Green",
+        "Blue",
+        "LiBlue",
+        "Black",
+        "White",
       ],
       propertiesCheckboxes: [
         "Vertical",
@@ -157,133 +158,52 @@ export default {
   },
   mounted() {
     this.countries = data;
-    // GET request using fetch with error handling
-    // fetch("https://restcountries.com/v3.1/all")
-    //   .then(async (response) => {
-    //     const data = await response.json();
-    //
-    //     for (let i in dataColors) this.countryColors.push(dataColors[i]);
-    //
-    //     this.countries = data;
-    //     // this.countries = this.countries.map((country) => {
-    //     //   country.trash = "";
-    //     //   return country;
-    //     // });
-    //
-    //     // this.propertiesCheckboxes = [
-    //     //   ...new Set(
-    //     //     this.countryColors.reduce((all, country) => {
-    //     //       return [
-    //     //         ...all,
-    //     //         ...country.Shapes.split(", "),
-    //     //         ...country.Symbols.split(", "),
-    //     //         ...country.Stripes.split(", "),
-    //     //         country.Cross,
-    //     //       ].filter((v) => v);
-    //     //     }, [])
-    //     //   ),
-    //     // ];
-    //     this.countryColors.forEach((country) => {
-    //       country.properties = [];
-    //
-    //       for (let color of this.colorCheckboxes) {
-    //         if (country[color.value]) country.properties.push(`${color.value}`);
-    //       }
-    //
-    //       for (let property of this.propertiesCheckboxes) {
-    //         for (let el of Object.values(country)) {
-    //           if (typeof el === "string" && el.split(", ").includes(property)) {
-    //             country.properties.push(property);
-    //           }
-    //         }
-    //       }
-    //     });
-    //
-    //     this.countries = this.countries.filter((country) => {
-    //       for (let i in this.countryColors) {
-    //         if (country.name.common === this.countryColors[i].Name) {
-    //           country.properties = this.countryColors[i].properties;
-    //           // country.trash = "trash";
-    //           // delete country.trash;
-    //           return true;
-    //           break;
-    //         }
-    //       }
-    //     });
-    //
-    //     // // A comparer used to determine if two entries are equal.
-    //     // const isSameUser = (a, b) => a.trash === b.trash;
-    //     //
-    //     // // Get items that only occur in the left array,
-    //     // // using the compareFunction to determine equality.
-    //     // const onlyInLeft = (left, right, compareFunction) =>
-    //     //   left.filter(
-    //     //     (leftValue) =>
-    //     //       !right.some((rightValue) =>
-    //     //         compareFunction(leftValue, rightValue)
-    //     //       )
-    //     //   );
-    //     //
-    //     // const onlyInA = onlyInLeft(
-    //     //   this.countries,
-    //     //   this.newCountries,
-    //     //   isSameUser
-    //     // );
-    //     //
-    //     // onlyInA.forEach((el) => {
-    //     //   console.log(el.name.common);
-    //     // });
-    //
-    //     if (!response.ok) {
-    //       const error = (data && data.message) || response.statusText;
-    //       return Promise.reject(error);
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     console.error("There was an error!", error);
-    //   });
+    document.addEventListener("click", (e) => {
+      let isContainer = document
+        .querySelector(".main-block__container")
+        .contains(e.target);
+      if (isContainer) {
+        document.querySelector("body").classList.remove("_lock");
+        document.querySelector("body").style.paddingRight = "0px";
+        this.$store.state.menuStatus = false;
+      }
+    });
   },
-  methods: {},
   computed: {
     filteredList() {
-      return this.countries.filter((country) => {
-        return country.name.common
+      return this.countries.filter((country) =>
+        country.name.common
           .toLowerCase()
-          .includes(this.search.toLowerCase());
-      });
+          .includes(this.$store.state.searchValue.toLowerCase())
+      );
     },
     sortedList() {
       if (this.selected === "nameAZ") {
-        return this.filteredList.sort(function (a, b) {
-          return a.name.common.localeCompare(b.name.common);
-        });
+        return this.filteredList.sort((a, b) =>
+          a.name.common.localeCompare(b.name.common)
+        );
       }
       if (this.selected === "nameZA") {
-        return this.filteredList.sort(function (a, b) {
-          return b.name.common.localeCompare(a.name.common);
-        });
+        return this.filteredList.sort((a, b) =>
+          b.name.common.localeCompare(a.name.common)
+        );
       }
       if (this.selected === "populationLower") {
-        return this.filteredList.sort(function (a, b) {
-          return a.population - b.population;
-        });
+        return this.filteredList.sort((a, b) => a.population - b.population);
       }
       if (this.selected === "populationHigher") {
-        return this.filteredList.sort(function (a, b) {
-          return b.population - a.population;
-        });
+        return this.filteredList.sort((a, b) => b.population - a.population);
       }
       if (this.selected === null) {
         return this.filteredList();
       }
     },
-    color: function () {
-      console.log(this.includes);
+    color() {
       if (this.checkbox.length > 0) {
         if (this.includes === "all") {
-          return this.sortedList.filter((country) => {
-            return this.checkbox.every((v) => country.colors.includes(v));
-          });
+          return this.sortedList.filter((country) =>
+            this.checkbox.every((v) => country.colors.includes(v))
+          );
         } else {
           return this.sortedList.filter(
             (country) =>
@@ -293,8 +213,23 @@ export default {
       }
       return this.sortedList;
     },
+    region() {
+      if (this.selectedRegion) {
+        return this.color.filter(
+          (country) => country.region === this.selectedRegion
+        );
+      } else {
+        return this.color;
+      }
+    },
+    properties() {
+      if (this.selectedProperty.length > 0) {
+        return this.region.filter((country) =>
+          this.selectedProperty.every((v) => country.properties.includes(v))
+        );
+      }
+      return this.region;
+    },
   },
 };
 </script>
-
-<style scoped></style>
