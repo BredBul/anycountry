@@ -90,26 +90,22 @@ export default {
   },
   computed: {
     country() {
-      return this.countries.find((el) => {
-        console.log(el);
-
-        return el.name.common
-          .toLowerCase()
-          .split(" ")
-          .join("")
-          .includes(this.id);
-      });
+      return this.countries.find((el) =>
+        el.name.common.toLowerCase().split(" ").join("").includes(this.id)
+      );
     },
     borders() {
-      return this.country.borders
-        .reduce(
-          (arr, border) => [
-            ...arr,
-            this.countries.find((el) => el.cca3 === border),
-          ],
-          []
-        )
-        .filter((el) => el);
+      if (this.country.borders) {
+        return this.country.borders
+          .reduce(
+            (arr, border) => [
+              ...arr,
+              this.countries.find((el) => el.cca3 === border),
+            ],
+            []
+          )
+          .filter((el) => el);
+      }
     },
   },
 };
