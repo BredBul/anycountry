@@ -116,13 +116,16 @@ body {
     height: 100%;
 
     position: fixed;
-    top: 72px;
+    top: 118px;
     right: 0;
 
     z-index: 10;
 
     background-color: getColor(base);
     border-left: 1px solid getColor(border);
+    @media (min-width: $tablet) {
+      top: 88px;
+    }
     .vs__selected-options {
       padding: 10px;
     }
