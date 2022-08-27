@@ -1,16 +1,32 @@
 <template>
   <section class="page__main-block main-block">
     <div class="main-block__container _container">
+      <div class="main-block__search">
+        <input
+          type="text"
+          v-model="$store.state.searchValue"
+          placeholder="Search for countries by country or capital name"
+        />
+      </div>
       <div class="main-block__content">
-        <v-country
+        <router-link
           v-for="(country, i) in properties"
           :key="i"
-          :flag="country.cca2"
-          :name="country.name.common"
-          :population="country.population"
-          :region="country.region"
-          :capital="country.capital"
-        />
+          :to="{
+            name: 'country',
+            params: {
+              id: `${country.name.common.toLowerCase().split(' ').join('')}`,
+            },
+          }"
+        >
+          <v-country
+            :flag="country.cca2"
+            :name="country.name.common"
+            :population="country.population"
+            :region="country.region"
+            :capital="country.capital"
+          />
+        </router-link>
       </div>
       <div
         class="item error"
@@ -19,85 +35,94 @@
         <p>No results found!</p>
       </div>
     </div>
-    <Transition name="menu">
-      <div class="main-block__filters" v-if="$store.state.menuStatus">
-        <v-select
-          class="main-block__regions"
-          :options="options"
-          v-model="selected"
-          :reduce="(option) => option.value"
-          :clearable="false"
-          label="label"
-        ></v-select>
-        <v-select
-          class="main-block__regions"
-          :options="regionsOptions"
-          v-model="selectedRegion"
-          placeholder="Filter by Region"
-          label="label"
-        ></v-select>
-        <div class="main-block__checkboxes">
-          <span>Filter by flag colors</span>
-          <div class="main-block__checkboxes-wrap">
-            <div v-for="option in colorCheckboxes" class="main-block__checkbox">
-              <input
-                :id="`checkbox-${option}`"
-                type="checkbox"
-                :value="option"
-                v-model="checkbox"
-              />
-              <label
-                :class="`main-block__checkbox-${option}`"
-                :for="`checkbox-${option}`"
-              ></label>
+    <Teleport to="body">
+      <Transition name="menu">
+        <div class="main-block__filters" v-if="$store.state.menuStatus">
+          <v-select
+            class="main-block__regions"
+            :options="options"
+            v-model="selected"
+            :reduce="(option) => option.value"
+            :clearable="false"
+            label="label"
+          ></v-select>
+          <v-select
+            class="main-block__regions"
+            :options="regionsOptions"
+            v-model="selectedRegion"
+            placeholder="Filter by Region"
+            label="label"
+          ></v-select>
+          <div class="main-block__checkboxes">
+            <span>Filter by flag colors</span>
+            <div class="main-block__checkboxes-wrap">
+              <div
+                v-for="option in colorCheckboxes"
+                class="main-block__checkbox"
+              >
+                <input
+                  :id="`checkbox-${option}`"
+                  type="checkbox"
+                  :value="option"
+                  v-model="checkbox"
+                />
+                <label
+                  :class="`main-block__checkbox-${option}`"
+                  :for="`checkbox-${option}`"
+                ></label>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="main-block__radio">
-          <div>
-            <input id="radio-all" type="radio" value="all" v-model="includes" />
-            <label class="main-block__radio-all" for="radio-all"
-              >Includes these colors</label
-            >
-          </div>
-          <div>
-            <input
-              id="radio-only"
-              type="radio"
-              value="only"
-              v-model="includes"
-            />
-            <label class="main-block__radio-only" for="radio-only"
-              >Includes only these colors</label
-            >
-          </div>
-        </div>
-        <div class="main-block__properties">
-          <span>Filter by flag properties</span>
-          <div class="main-block__properties-wrap">
-            <div v-for="option in propertiesCheckboxes">
+          <div class="main-block__radio">
+            <div>
               <input
-                :id="`property-${option}`"
-                type="checkbox"
-                :value="option"
-                v-model="selectedProperty"
+                id="radio-all"
+                type="radio"
+                value="all"
+                v-model="includes"
               />
-              <label
-                :class="`main-block__property-${option}`"
-                :for="`property-${option}`"
-                >{{ option }}</label
+              <label class="main-block__radio-all" for="radio-all"
+                >Includes these colors</label
+              >
+            </div>
+            <div>
+              <input
+                id="radio-only"
+                type="radio"
+                value="only"
+                v-model="includes"
+              />
+              <label class="main-block__radio-only" for="radio-only"
+                >Includes only these colors</label
               >
             </div>
           </div>
+          <div class="main-block__properties">
+            <span>Filter by flag properties</span>
+            <div class="main-block__properties-wrap">
+              <div v-for="option in propertiesCheckboxes">
+                <input
+                  :id="`property-${option}`"
+                  type="checkbox"
+                  :value="option"
+                  v-model="selectedProperty"
+                />
+                <label
+                  :class="`main-block__property-${option}`"
+                  :for="`property-${option}`"
+                  >{{ option }}</label
+                >
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </Transition>
+      </Transition>
+    </Teleport>
   </section>
 </template>
 
 <script>
 import VCountry from "../../components/country/VCountry.vue";
-import data from "../../assets/data.json";
 
 import Loading from "vue-loading-overlay";
 import vSelect from "vue-select";
@@ -110,7 +135,7 @@ export default {
   components: { VCountry, Loading, vSelect },
   data() {
     return {
-      countries: [],
+      countries: this.$store.state.dataCountries,
       selected: "nameAZ",
       selectedRegion: null,
       checkbox: [],
@@ -157,24 +182,29 @@ export default {
     };
   },
   mounted() {
-    this.countries = data;
     document.addEventListener("click", (e) => {
-      let isContainer = document
-        .querySelector(".main-block__container")
-        .contains(e.target);
-      if (isContainer) {
-        document.querySelector("body").classList.remove("_lock");
-        document.querySelector("body").style.paddingRight = "0px";
-        this.$store.state.menuStatus = false;
+      if (document.querySelector("body").classList.contains("_lock")) {
+        let isContainer = document.querySelector("main").contains(e.target);
+        if (isContainer) {
+          document.querySelector("body").classList.remove("_lock");
+          document.querySelector("body").style.paddingRight = "0px";
+          this.$store.state.menuStatus = false;
+        }
       }
     });
   },
   computed: {
     filteredList() {
-      return this.countries.filter((country) =>
-        country.name.common
-          .toLowerCase()
-          .includes(this.$store.state.searchValue.toLowerCase())
+      return this.countries.filter(
+        (country) =>
+          country.name.common
+            .toLowerCase()
+            .includes(this.$store.state.searchValue.toLowerCase()) ||
+          country.capital
+            .sort()
+            .join(",")
+            .toLowerCase()
+            .includes(this.$store.state.searchValue.toLowerCase())
       );
     },
     sortedList() {

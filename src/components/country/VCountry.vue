@@ -8,9 +8,13 @@
         />
       </div>
       <div class="country__name">{{ name }}</div>
-      <div class="country__item">Population: {{ population }}</div>
-      <div class="country__item">Region: {{ region }}</div>
-      <div class="country__item">Capital: {{ capital.join(", ") }}</div>
+      <div class="country__item">
+        <span>Population:</span> {{ $store.state.numberWithCommas(population) }}
+      </div>
+      <div class="country__item"><span>Region:</span> {{ region }}</div>
+      <div class="country__item">
+        <span>Capital:</span> {{ capital.join(", ") }}
+      </div>
     </div>
   </div>
 </template>
@@ -54,7 +58,7 @@ export default {
     flex-direction: column;
     padding: 20px 20px 30px;
     width: 100%;
-    background-color: rgba(0, 0, 0, 0.025);
+    background-color: #fff;
   }
   &__flag {
     padding-bottom: 60%;

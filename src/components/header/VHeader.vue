@@ -2,15 +2,11 @@
   <header class="header">
     <div class="header__container _container">
       <div class="header__content">
-        <div class="header__title">AnyCountry?</div>
-        <div class="header__search">
-          <input
-            type="text"
-            v-model="$store.state.searchValue"
-            placeholder="Search for countries"
-          />
+        <div class="header__title">
+          <router-link :to="{ name: 'home' }">AnyCountry?</router-link>
         </div>
         <button
+          v-if="this.$route.path === '/'"
           @click="openMenu()"
           class="header__menu"
           :class="{ open: $store.state.menuStatus }"
@@ -66,22 +62,7 @@ export default {
       justify-content: space-between;
     }
   }
-  &__search {
-    padding: 10px;
-    max-width: 350px;
-    width: 100%;
-    border-radius: 6px;
-    background: white;
-    border: 1px solid #f1f1f1;
-    box-shadow: 0px 2px 4px rgb(0 0 0 / 8%);
 
-    input {
-      appearance: none;
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #e7e8e3;
-    }
-  }
   &__title {
     font-size: 24px;
     font-weight: 700;
