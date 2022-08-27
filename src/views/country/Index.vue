@@ -90,9 +90,15 @@ export default {
   },
   computed: {
     country() {
-      return this.countries.find((el) =>
-        el.name.common.toLowerCase().split(" ").join("").includes(this.id)
-      );
+      return this.countries.find((el) => {
+        console.log(el);
+
+        return el.name.common
+          .toLowerCase()
+          .split(" ")
+          .join("")
+          .includes(this.id);
+      });
     },
     borders() {
       return this.country.borders
@@ -146,8 +152,10 @@ export default {
     }
   }
   &__flag {
-    padding-bottom: 66%;
     width: 100%;
+    @media (max-width: $tablet) {
+      padding-bottom: 66%;
+    }
     @media (min-width: $tablet) {
       min-height: 400px;
       flex: 0 0 600px;
