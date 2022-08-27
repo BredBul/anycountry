@@ -14,6 +14,7 @@ const store = createStore({
       searchValue: "",
       menuStatus: false,
       dataCountries: data,
+      darkMode: false,
       numberWithCommas: (x) =>
         x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."),
     };

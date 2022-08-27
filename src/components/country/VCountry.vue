@@ -49,7 +49,7 @@ export default {
 
 <style lang="scss" scoped>
 .country {
-  border: 1px solid #e7e8e3;
+  border: 1px solid getColor(border);
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08);
   border-radius: 16px;
   overflow: hidden;
@@ -58,7 +58,8 @@ export default {
     flex-direction: column;
     padding: 20px 20px 30px;
     width: 100%;
-    background-color: #fff;
+    background-color: getColor(base);
+    color: getColor(sec);
   }
   &__flag {
     padding-bottom: 60%;
@@ -74,8 +75,5 @@ export default {
   &__item {
     margin-bottom: 10px;
   }
-}
-
-._ibg {
 }
 </style>

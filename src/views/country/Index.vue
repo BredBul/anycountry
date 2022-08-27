@@ -130,6 +130,7 @@ export default {
     cursor: pointer;
     span {
       font-weight: 500;
+      color: getColor(sec);
     }
     &:hover {
       transform: translateY(-2px);

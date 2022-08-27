@@ -5,6 +5,7 @@
         <div class="header__title">
           <router-link :to="{ name: 'home' }">AnyCountry?</router-link>
         </div>
+        <dark-mode-icon class="header__dark-mode" />
         <button
           v-if="this.$route.path === '/'"
           @click="openMenu()"
@@ -21,8 +22,11 @@
 </template>
 
 <script>
+import darkModeIcon from "../darkModeIcon.vue";
+
 export default {
   name: "VHeader",
+  components: { darkModeIcon },
   methods: {
     openMenu() {
       let scrollWidth =
@@ -31,8 +35,12 @@ export default {
       document.querySelector("body").classList.toggle("_lock");
       if (this.$store.state.menuStatus) {
         document.querySelector("body").style.paddingRight = scrollWidth + "px";
+        document.querySelector(
+          "header"
+        ).style.width = `calc(100% + ${scrollWidth}px`;
       } else {
         document.querySelector("body").style.paddingRight = "0px";
+        document.querySelector("header").style.width = "100%";
       }
     },
   },
@@ -41,25 +49,24 @@ export default {
 
 <style lang="scss">
 .header {
-  background-color: #fff;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+  background-color: getColor(base);
+  border-bottom: 1px solid getColor(border);
   position: sticky;
   top: 0;
   z-index: 5;
   &__container {
+    position: relative;
   }
 
   &__content {
     display: flex;
-    padding: 20px 45px 20px 0;
-    position: relative;
-    @media (max-width: 768px) {
-      flex-direction: column;
-      gap: 20px;
-    }
-    @media (min-width: 769px) {
-      align-items: center;
-      justify-content: space-between;
+    padding: 50px 0 20px;
+    justify-content: space-between;
+    align-items: center;
+
+    @media (min-width: $tablet) {
+      position: relative;
+      padding: 20px 45px 20px 0;
     }
   }
 
@@ -67,6 +74,12 @@ export default {
     font-size: 24px;
     font-weight: 700;
     text-transform: uppercase;
+    color: getColor(sec);
+  }
+  &__dark-mode {
+    svg {
+      display: flex;
+    }
   }
   &__menu {
     position: absolute;
@@ -78,6 +91,10 @@ export default {
     justify-content: space-between;
     cursor: pointer;
     transition: transform 0.4s ease-out;
+    @media (max-width: $tablet) {
+      top: 16px;
+      right: 15px;
+    }
     &.open {
       transform: rotate(-45deg);
       span {
@@ -90,7 +107,7 @@ export default {
       }
     }
     span {
-      background-color: #000;
+      background-color: getColor(sec);
       border-radius: 5px;
       width: 100%;
       height: 3px;

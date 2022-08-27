@@ -5,3 +5,52 @@ $pc: $maxWidthContainer + 20px;
 $laptop: 1024px;
 $tablet: 768px;
 $mobile: 570px;
+
+$colors: (
+  base: #fff,
+  sec: #000,
+  bg: rgba(0, 0, 0, 0.03),
+  border: rgba(0, 0, 0, 0.3),
+);
+
+$colors-dark: (
+  base: #2b3743,
+  sec: #fff,
+  bg: #202d36,
+  border: rgba(0, 0, 0, 0.3),
+);
+
+:root {
+  @each $name, $color in $colors {
+    --color-#{$name}: #{$color};
+  }
+  --theme: "light";
+}
+
+//@media (prefers-color-scheme: dark) {
+//  :root {
+//    @each $name, $color in $colors-dark {
+//      --color-#{$name}: #{$color};
+//    }
+//    --theme: "dark";
+//    --vs-dropdown-bg: #202d36;
+//    --vs-border-color: rgba(0, 0, 0, 0.3);
+//    --vs-controls-color: #fff;
+//    --vs-selected-color: #fff;
+//  }
+//}
+
+body.dark {
+  @each $name, $color in $colors-dark {
+    --color-#{$name}: #{$color};
+  }
+  --theme: "dark";
+  --vs-dropdown-bg: #202d36;
+  --vs-border-color: rgba(0, 0, 0, 0.3);
+  --vs-controls-color: #fff;
+  --vs-selected-color: #fff;
+}
+
+@function getColor($color-name) {
+  @return var(--color-#{$color-name});
+}

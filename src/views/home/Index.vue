@@ -5,7 +5,7 @@
         <input
           type="text"
           v-model="$store.state.searchValue"
-          placeholder="Search for countries by country or capital name"
+          placeholder="Search by country or capital name"
         />
       </div>
       <div class="main-block__content">
@@ -188,6 +188,7 @@ export default {
         if (isContainer) {
           document.querySelector("body").classList.remove("_lock");
           document.querySelector("body").style.paddingRight = "0px";
+          document.querySelector("header").style.width = "100%";
           this.$store.state.menuStatus = false;
         }
       }
